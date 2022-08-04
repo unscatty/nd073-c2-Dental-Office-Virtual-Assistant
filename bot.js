@@ -9,8 +9,6 @@ const IntentRecognizer = require('./intentrecognizer');
 
 const INTENT_SCORE_THRESHOLD = 0.6;
 
-const availableTimes = ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm'];
-
 class DentaBot extends ActivityHandler {
   constructor(configuration, qnaOptions) {
     // call the parent constructor
@@ -22,9 +20,12 @@ class DentaBot extends ActivityHandler {
     // console.debug(configuration.QnAConfiguration)
 
     // create a DentistScheduler connector
+    this.dentistScheduler = new DentistScheduler(configuration.SchedulerConfiguration);
 
     // create a IntentRecognizer connector
     this.intentRecognizer = new IntentRecognizer(configuration.LuisConfiguration);
+
+    this.availableTimes = [];
 
     this.onMessage(async (context, next) => {
       // send user input to QnA Maker and collect the response in a variable
@@ -39,7 +40,13 @@ class DentaBot extends ActivityHandler {
 
       if (luisTopIntent === 'getAvailability' && luisResult.intents.getAvailability?.score >= INTENT_SCORE_THRESHOLD) {
         // No instances
-        await context.sendActivity(`These are the available times: ${ availableTimes.join(', ') }`);
+        await this.fetchAvailabilty();
+
+        if (this.availableTimes.length > 0) {
+          await context.sendActivity(`These are the available times: ${ this.availableTimes.join(', ') }`);
+        } else {
+          await context.sendActivity('There are no available times');
+        }
         await next();
         return;
       }
@@ -50,7 +57,10 @@ class DentaBot extends ActivityHandler {
         if (instances && instances.scheduleTime && instances.scheduleTime[0]) {
           const selectedTime = instances.scheduleTime[0].text;
 
-          if (availableTimes.includes(selectedTime)) {
+          await this.fetchAvailabilty();
+
+          if (this.availableTimes.includes(selectedTime)) {
+            await this.dentistScheduler.scheduleAppointment(selectedTime);
             await context.sendActivity(`Appointment set at ${ selectedTime }`);
           } else {
             await context.sendActivity('Selected time is not available');
@@ -95,6 +105,15 @@ class DentaBot extends ActivityHandler {
       // by calling next() you ensure that the next BotHandler is run.
       await next();
     });
+  }
+
+  async fetchAvailabilty() {
+    if (this.availableTimes.length < 1) {
+      try {
+        this.availableTimes = await this.dentistScheduler.getAvailability() || [];
+      } catch (err) {
+      }
+    }
   }
 }
 
