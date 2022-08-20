@@ -7,7 +7,7 @@ const { QnAMaker } = require('botbuilder-ai');
 const DentistScheduler = require('./dentistscheduler');
 const IntentRecognizer = require('./intentrecognizer');
 
-const INTENT_SCORE_THRESHOLD = 0.6;
+const INTENT_SCORE_THRESHOLD = 0.45;
 
 class DentaBot extends ActivityHandler {
   constructor(configuration, qnaOptions) {
@@ -96,7 +96,7 @@ class DentaBot extends ActivityHandler {
     this.onMembersAdded(async (context, next) => {
       const membersAdded = context.activity.membersAdded;
       // write a custom greeting
-      const welcomeText = 'Hello';
+      const welcomeText = 'Hello and welcome to Contoso Dentistry\n\nHere you can ask any questions about our services\n\nAlso you can set an appointment';
       for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
         if (membersAdded[cnt].id !== context.activity.recipient.id) {
           await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
