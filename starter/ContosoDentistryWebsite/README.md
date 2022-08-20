@@ -1,0 +1,1 @@
+The dentistry website is hosted on Azure Blob Storage Static Website and can be accessed at https://contosodentistrystatic.z21.web.core.windows.net/
