@@ -40,7 +40,7 @@ class DentaBot extends ActivityHandler {
 
       if (luisTopIntent === 'getAvailability' && luisResult.intents.getAvailability?.score >= INTENT_SCORE_THRESHOLD) {
         // No instances
-        await this.fetchAvailabilty();
+        await this.fetchAvailability();
 
         if (this.availableTimes.length > 0) {
           await context.sendActivity(`These are the available times: ${ this.availableTimes.join(', ') }`);
@@ -57,7 +57,7 @@ class DentaBot extends ActivityHandler {
         if (instances && instances.scheduleTime && instances.scheduleTime[0]) {
           const selectedTime = instances.scheduleTime[0].text;
 
-          await this.fetchAvailabilty();
+          await this.fetchAvailability();
 
           if (this.availableTimes.includes(selectedTime)) {
             await this.dentistScheduler.scheduleAppointment(selectedTime);
@@ -107,7 +107,7 @@ class DentaBot extends ActivityHandler {
     });
   }
 
-  async fetchAvailabilty() {
+  async fetchAvailability() {
     if (this.availableTimes.length < 1) {
       try {
         this.availableTimes = await this.dentistScheduler.getAvailability() || [];
