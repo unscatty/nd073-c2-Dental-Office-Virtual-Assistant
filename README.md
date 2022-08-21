@@ -11,6 +11,12 @@ The repository for the scheduler API is located at https://github.com/unscatty/c
 #### Final results
 The Contoso Dentistry website can be accessed at https://contosodentistrystatic.z21.web.core.windows.net/
 
+Testing the bot LUIS service using the Bot Emulator
+![](bot_emulator_test_luis.png)
+
+Testing the bot QnA service using the Bot Emulator
+![](bot_emulator_test_qna.png)
+
 Testing the bot in Azure Portal
 ![](portal_bot_test.png)
 
